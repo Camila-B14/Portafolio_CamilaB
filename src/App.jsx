@@ -14,6 +14,41 @@ import {
 import { filters, process, profile, projects, services, stack } from './data.js'
 
 const ease = [0.22, 1, 0.36, 1]
+const asset = (f) => `${import.meta.env.BASE_URL}brand/${f}`
+
+/* Red de nodos tomada del fondo de portada de la marca (coordenadas del original). */
+const netNodes = [
+  [25, 212, 3], [100, 80, 5], [270, 23, 4], [440, 156, 6], [175, 288, 4], [365, 345, 7], [516, 477, 5], [289, 534, 4],
+]
+const netEdges = [[1, 2], [2, 3], [1, 0], [0, 4], [1, 4], [2, 4], [4, 5], [5, 3], [3, 6], [5, 6], [5, 7], [7, 6]]
+
+function Constellation({ className }) {
+  return (
+    <svg className={`constellation ${className || ''}`} viewBox="0 0 540 560" aria-hidden="true">
+      {netEdges.map(([a, b], i) => (
+        <motion.line
+          key={i}
+          x1={netNodes[a][0]} y1={netNodes[a][1]} x2={netNodes[b][0]} y2={netNodes[b][1]}
+          initial={{ pathLength: 0, opacity: 0 }}
+          animate={{ pathLength: 1, opacity: 1 }}
+          transition={{ duration: 1.1, delay: 0.4 + i * 0.09, ease }}
+        />
+      ))}
+      {netNodes.map(([x, y, r], i) => (
+        <motion.circle
+          key={i}
+          cx={x} cy={y} r={r}
+          initial={{ scale: 0, opacity: 0 }}
+          animate={{ scale: 1, opacity: [0.55, 1, 0.55] }}
+          transition={{
+            scale: { duration: 0.5, delay: 0.3 + i * 0.1, ease },
+            opacity: { duration: 3.2, delay: 1.2 + i * 0.35, repeat: Infinity, ease: 'easeInOut' },
+          }}
+        />
+      ))}
+    </svg>
+  )
+}
 
 /* ------------------------------------------------------------------ utilidades */
 
@@ -93,8 +128,8 @@ function Nav() {
     <header className={`nav ${scrolled ? 'is-scrolled' : ''}`}>
       <div className="wrap nav-inner">
         <a href="#inicio" className="brand" aria-label="Camila Beleño, ir al inicio">
-          <span className="brand-mark" aria-hidden="true">CB</span>
-          <span>{profile.name}</span>
+          <img className="logo logo-color" src={asset('cb-logo-horizontal.svg')} alt="" width="640" height="160" />
+          <img className="logo logo-white" src={asset('cb-logo-horizontal-blanco.svg')} alt="" width="640" height="160" />
         </a>
         <LayoutGroup id="nav">
           <nav aria-label="Secciones" className="nav-links">
@@ -269,6 +304,10 @@ function Hero() {
 
   return (
     <section id="inicio" className="hero" ref={ref}>
+      <div className="hero-bg" aria-hidden="true">
+        <span className="watermark">CB</span>
+        <Constellation className="hero-net" />
+      </div>
       <div className="wrap hero-grid">
         <div>
           <motion.p
@@ -277,7 +316,7 @@ function Hero() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, ease }}
           >
-            <span className="dot" aria-hidden="true" /> Disponible para proyectos · {profile.location}
+            <span className="dot" aria-hidden="true" /> AI · Data · Systems · {profile.location}
           </motion.p>
           <h1 className="hero-title" aria-label={headline.join(' ')}>
             {headline.map((w, i) => (
@@ -641,7 +680,8 @@ function About() {
       <div className="wrap about">
         <Reveal className="about-photo">
           <div className="photo-slot">
-            <span className="brand-mark big" aria-hidden="true">CB</span>
+            <img src={asset('cb-monograma.svg')} alt="" width="120" height="120" className="mono-logo mono-logo-color" />
+            <img src={asset('cb-monograma-blanco.svg')} alt="" width="120" height="120" className="mono-logo mono-logo-white" />
             <span className="mono">Foto pendiente</span>
           </div>
         </Reveal>
@@ -687,6 +727,7 @@ function Contact() {
   }
   return (
     <section id="contacto" className="contact">
+      <Constellation className="contact-net" />
       <div className="wrap">
         <Reveal>
           <p className="eyebrow eyebrow-dark">Contacto</p>
