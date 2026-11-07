@@ -1,5 +1,14 @@
 // Todo el contenido del portafolio vive aquí: para agregar un proyecto o cambiar un texto
 // no hace falta tocar los componentes.
+//
+// IMÁGENES: guárdalas en public/media/<proyecto>/ y escribe la ruta en `src` con media('...').
+//   Ejemplo: { label: 'Mesa de empaque', src: media('packcheck/mesa.webp'), alt: 'Operaria verificando una caja' }
+//   Sin `src`, la página muestra el espacio "Captura pendiente".
+// VIDEOS: agrega a un proyecto  video: { youtube: 'ID_DEL_VIDEO' }
+//   o un archivo propio           video: { src: media('packcheck/demo.mp4'), poster: media('packcheck/poster.webp') }
+//   Con `video`, aparece el botón "Ver video" en la tarjeta del proyecto.
+
+const media = (path) => `${import.meta.env.BASE_URL}media/${path}`
 
 export const profile = {
   name: 'Camila Beleño',
@@ -49,7 +58,12 @@ export const projects = [
         'Diseño y desarrollo de punta a punta: levantamiento del proceso en bodega, lectura de documentos, reglas de negocio, modelo de datos, visión artificial, interfaz por rol, despliegue en Azure, plan de lanzamiento y manuales de usuario.',
     },
     stack: ['React', 'FastAPI', 'PostgreSQL', 'PyTorch', 'YOLO-World', 'DINOv2', 'RapidOCR', 'Azure'],
-    shots: ['Mesa de empaque', 'Caja aprobada', 'Caja con error'],
+    shots: [
+      { label: 'Mesa de empaque', src: '' },
+      { label: 'Caja aprobada', src: '' },
+      { label: 'Caja con error', src: '' },
+    ],
+    video: null,
     links: [],
     note: 'Código privado del cliente. Este caso muestra el proyecto.',
   },
@@ -79,7 +93,12 @@ export const projects = [
       role: 'Análisis del proceso, modelo de datos sobre Excel, desarrollo del tablero y diseño de la interfaz.',
     },
     stack: ['Python', 'Streamlit', 'pandas', 'Plotly', 'Microsoft Graph', 'Excel'],
-    shots: ['Control general de operaciones', 'Detalle por operación', 'Referencias en producción'],
+    shots: [
+      { label: 'Control general de operaciones', src: '' },
+      { label: 'Detalle por operación', src: '' },
+      { label: 'Referencias en producción', src: '' },
+    ],
+    video: null,
     links: [{ label: 'Ver código', href: 'https://github.com/Camila-B14/Dashboard_logistica_distribucion_PYS' }],
   },
   {

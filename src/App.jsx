@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { Component, Suspense, lazy, useEffect, useRef, useState } from 'react'
 import {
   AnimatePresence,
   LayoutGroup,
@@ -6,12 +6,55 @@ import {
   animate,
   motion,
   useInView,
+  useMotionValue,
   useReducedMotion,
   useScroll,
   useSpring,
   useTransform,
 } from 'framer-motion'
 import { filters, process, profile, projects, services, stack } from './data.js'
+
+const NeuralScene = lazy(() => import('./NeuralScene.jsx'))
+
+// Si el navegador no tiene WebGL, se muestra la red en 2D en su lugar.
+class SafeBoundary extends Component {
+  state = { failed: false }
+  static getDerivedStateFromError() { return { failed: true } }
+  render() { return this.state.failed ? this.props.fallback : this.props.children }
+}
+
+/* Inclinación 3D que sigue al cursor (solo con mouse; en táctil queda quieta). */
+function Tilt({ children, max = 8, className, glare = false }) {
+  const rx = useMotionValue(0)
+  const ry = useMotionValue(0)
+  const gx = useMotionValue(50)
+  const gy = useMotionValue(50)
+  const srx = useSpring(rx, { stiffness: 180, damping: 18 })
+  const sry = useSpring(ry, { stiffness: 180, damping: 18 })
+  const bg = useTransform([gx, gy], ([x, y]) => `radial-gradient(circle at ${x}% ${y}%, rgba(255,255,255,0.35), transparent 55%)`)
+  const move = (e) => {
+    if (e.pointerType !== 'mouse') return
+    const r = e.currentTarget.getBoundingClientRect()
+    const px = (e.clientX - r.left) / r.width
+    const py = (e.clientY - r.top) / r.height
+    ry.set((px - 0.5) * max * 2)
+    rx.set(-(py - 0.5) * max * 2)
+    gx.set(px * 100)
+    gy.set(py * 100)
+  }
+  const leave = () => { rx.set(0); ry.set(0) }
+  return (
+    <motion.div
+      className={`tilt ${className || ''}`}
+      onPointerMove={move}
+      onPointerLeave={leave}
+      style={{ rotateX: srx, rotateY: sry, transformPerspective: 1100 }}
+    >
+      {children}
+      {glare && <motion.span className="glare" style={{ background: bg }} aria-hidden="true" />}
+    </motion.div>
+  )
+}
 
 const ease = [0.22, 1, 0.36, 1]
 const asset = (f) => `${import.meta.env.BASE_URL}brand/${f}`
@@ -306,7 +349,13 @@ function Hero() {
     <section id="inicio" className="hero" ref={ref}>
       <div className="hero-bg" aria-hidden="true">
         <span className="watermark">CB</span>
-        <Constellation className="hero-net" />
+        <SafeBoundary fallback={<Constellation className="hero-net" />}>
+          <Suspense fallback={<Constellation className="hero-net" />}>
+            <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 1.6, ease }}>
+              <NeuralScene className="hero-3d" />
+            </motion.div>
+          </Suspense>
+        </SafeBoundary>
       </div>
       <div className="wrap hero-grid">
         <div>
@@ -367,7 +416,7 @@ function Hero() {
           </motion.dl>
         </div>
         <motion.div style={{ y: ySlip }} className="hero-visual">
-          <PackingSlip />
+          <Tilt max={9} glare className="slip-tilt"><PackingSlip /></Tilt>
         </motion.div>
       </div>
       <Marquee />
@@ -396,14 +445,64 @@ function Marquee() {
 
 /* ------------------------------------------------------------------ proyectos */
 
-function Shot({ label, big }) {
+function Shot({ shot, big }) {
+  const { label, src, alt } = typeof shot === 'string' ? { label: shot } : shot
   return (
-    <motion.div className={`shot ${big ? 'shot-big' : ''}`} whileHover={{ scale: 1.015 }} transition={{ duration: 0.3 }}>
-      <div className="shot-bar" aria-hidden="true"><i /><i /><i /></div>
-      <div className="shot-body">
-        <span className="mono">Captura pendiente</span>
-        <span>{label}</span>
-      </div>
+    <Tilt max={5} glare className={`shot-wrap ${big ? 'shot-big' : ''}`}>
+      <figure className="shot">
+        <div className="shot-bar" aria-hidden="true"><i /><i /><i /><span>{label}</span></div>
+        {src ? (
+          <img className="shot-img" src={src} alt={alt || label} loading="lazy" />
+        ) : (
+          <div className="shot-body">
+            <span className="mono">Captura pendiente</span>
+            <span>{label}</span>
+          </div>
+        )}
+      </figure>
+    </Tilt>
+  )
+}
+
+function VideoModal({ project, onClose }) {
+  const v = project.video
+  useEffect(() => {
+    const onKey = (e) => e.key === 'Escape' && onClose()
+    window.addEventListener('keydown', onKey)
+    document.body.style.overflow = 'hidden'
+    return () => { window.removeEventListener('keydown', onKey); document.body.style.overflow = '' }
+  }, [onClose])
+  return (
+    <motion.div className="modal" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={onClose}>
+      <motion.div
+        className="modal-card"
+        role="dialog"
+        aria-modal="true"
+        aria-label={`Video de ${project.name}`}
+        initial={{ scale: 0.9, rotateX: 18, y: 40 }}
+        animate={{ scale: 1, rotateX: 0, y: 0 }}
+        exit={{ scale: 0.94, y: 20, opacity: 0 }}
+        transition={{ type: 'spring', stiffness: 260, damping: 26 }}
+        style={{ transformPerspective: 1200 }}
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="modal-head">
+          <span className="mono">{project.name} · demostración</span>
+          <button id="close-video" className="link-btn modal-close" onClick={onClose} autoFocus>Cerrar ✕</button>
+        </div>
+        <div className="modal-media">
+          {v.youtube ? (
+            <iframe
+              src={`https://www.youtube-nocookie.com/embed/${v.youtube}?autoplay=1&rel=0`}
+              title={`Video de ${project.name}`}
+              allow="autoplay; encrypted-media; picture-in-picture"
+              allowFullScreen
+            />
+          ) : (
+            <video src={v.src} poster={v.poster} controls autoPlay playsInline />
+          )}
+        </div>
+      </motion.div>
     </motion.div>
   )
 }
@@ -457,6 +556,7 @@ function CaseStudy({ p }) {
 
 function ProjectCard({ p }) {
   const [open, setOpen] = useState(false)
+  const [playing, setPlaying] = useState(false)
 
   if (p.pending) {
     return (
@@ -514,6 +614,11 @@ function ProjectCard({ p }) {
               {open ? 'Cerrar caso' : 'Ver caso completo'}
               <motion.span aria-hidden="true" animate={{ rotate: open ? 45 : 0 }} className="plus">+</motion.span>
             </motion.button>
+            {p.video && (
+              <motion.button id={`video-${p.id}`} className="btn btn-ghost" onClick={() => setPlaying(true)} whileHover={{ y: -2 }} whileTap={{ scale: 0.97 }}>
+                <span className="play" aria-hidden="true">▶</span> Ver video
+              </motion.button>
+            )}
             {p.links.map((l) => (
               <a key={l.href} href={l.href} className="text-link" target="_blank" rel="noreferrer">{l.label} ↗</a>
             ))}
@@ -521,14 +626,15 @@ function ProjectCard({ p }) {
           {p.note && <p className="note mono">{p.note}</p>}
         </div>
         <div className="shots">
-          <Shot label={p.shots[0]} big />
-          <Shot label={p.shots[1]} />
-          <Shot label={p.shots[2]} />
+          <Shot shot={p.shots[0]} big />
+          <Shot shot={p.shots[1]} />
+          <Shot shot={p.shots[2]} />
         </div>
       </div>
       <div id={`case-panel-${p.id}`}>
         <AnimatePresence initial={false}>{open && <CaseStudy p={p} />}</AnimatePresence>
       </div>
+      <AnimatePresence>{playing && <VideoModal project={p} onClose={() => setPlaying(false)} />}</AnimatePresence>
     </motion.article>
   )
 }
@@ -621,7 +727,16 @@ function Services() {
         </Reveal>
         <div className="services">
           {services.map((s, i) => (
-            <Reveal key={s.title} delay={i * 0.08} className="service-wrap">
+            <motion.div
+              key={s.title}
+              className="service-wrap"
+              initial={{ rotateX: 28, y: 50, opacity: 0.3 }}
+              whileInView={{ rotateX: 0, y: 0, opacity: 1 }}
+              viewport={{ once: true, margin: '-60px' }}
+              transition={{ duration: 0.9, delay: i * 0.1, ease }}
+              style={{ transformPerspective: 900, transformOrigin: '50% 100%' }}
+            >
+              <Tilt max={7} glare className="service-tilt">
               <motion.article className="service" whileHover="hover" initial="rest" animate="rest">
                 <span className="mono service-n">0{i + 1}</span>
                 <h3>{s.title}</h3>
@@ -634,7 +749,8 @@ function Services() {
                   transition={{ duration: 0.45, ease }}
                 />
               </motion.article>
-            </Reveal>
+              </Tilt>
+            </motion.div>
           ))}
         </div>
       </div>

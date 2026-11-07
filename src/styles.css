@@ -307,3 +307,35 @@ p { margin: 0; }
   .process-dot { left: -58px; width: 40px; height: 40px; }
   .process-rail { left: 19px; }
 }
+
+/* ---------- 3D */
+.hero-3d { position: absolute; top: 0; right: -8%; width: 60%; height: 100%; -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 30%); mask-image: linear-gradient(90deg, transparent 0%, #000 30%); }
+.hero-3d canvas { display: block; }
+.tilt { position: relative; transform-style: preserve-3d; will-change: transform; }
+.glare { position: absolute; inset: 0; border-radius: inherit; pointer-events: none; mix-blend-mode: soft-light; opacity: 0; transition: opacity 0.3s; }
+.tilt:hover .glare { opacity: 1; }
+.slip-tilt { border-radius: 14px; }
+.slip-tilt .glare { border-radius: 14px; }
+.service-wrap > .service-tilt { width: 100%; border-radius: 16px; display: flex; }
+.shot-wrap { border-radius: 12px; }
+.shot-wrap.shot-big { grid-column: 1 / -1; }
+.shot { margin: 0; height: 100%; }
+.shot-bar { align-items: center; }
+.shot-bar span { margin-left: 8px; font-family: var(--mono); font-size: 11px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.shot-img { display: block; width: 100%; aspect-ratio: 16 / 10; object-fit: cover; object-position: top; }
+.play { display: inline-grid; place-items: center; width: 24px; height: 24px; border-radius: 50%; background: var(--accent); color: var(--accent-ink); font-size: 10px; padding-left: 2px; }
+
+/* video */
+.modal { position: fixed; inset: 0; z-index: 90; display: grid; place-items: center; padding: 16px; background: rgba(22, 13, 34, 0.78); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
+.modal-card { width: min(1100px, 100%); background: var(--dark); border-radius: 16px; overflow: hidden; box-shadow: 0 40px 80px -20px rgba(0, 0, 0, 0.6); border: 1px solid color-mix(in srgb, var(--brand-soft) 25%, transparent); }
+.modal-head { display: flex; justify-content: space-between; align-items: center; padding: 12px 18px; }
+.modal-head .mono { color: var(--on-dark-muted); }
+.modal-close { color: var(--on-dark-muted); }
+.modal-close:hover { color: #fff; }
+.modal-media { aspect-ratio: 16 / 9; background: #000; }
+.modal-media iframe, .modal-media video { width: 100%; height: 100%; border: 0; display: block; }
+
+@media (max-width: 860px) {
+  .hero-3d { width: 100%; right: -38%; opacity: 0.35; -webkit-mask-image: linear-gradient(90deg, transparent 10%, #000 55%); mask-image: linear-gradient(90deg, transparent 10%, #000 55%); }
+}
+@media (hover: none) { .glare { display: none; } }
