@@ -151,7 +151,17 @@ export const services = [
   {
     title: 'Sistemas a medida para la operación',
     text: 'Aplicaciones web para bodega, despacho, importaciones o planta, pensadas para quien las usa todo el día.',
-    tag: 'React · FastAPI · PostgreSQL',
+    tag: 'React · FastAPI · PHP · PostgreSQL',
+  },
+  {
+    title: 'Agentes de IA con voz y RAG',
+    text: 'Agentes que conversan por voz o por chat y responden con el conocimiento de tu empresa: documentos, políticas, catálogos y procesos.',
+    tag: 'Agentes de voz · RAG · LLM',
+  },
+  {
+    title: 'CRM: creación y gestión',
+    text: 'Creo CRMs a la medida o implemento y administro el tuyo: embudo de ventas, seguimiento de clientes, automatizaciones, reportes y capacitación del equipo.',
+    tag: 'Creación · Implementación · Gestión',
   },
   {
     title: 'Visión artificial aplicada',
@@ -160,12 +170,12 @@ export const services = [
   },
   {
     title: 'Tableros de datos',
-    text: 'Tus archivos de Excel convertidos en indicadores claros, alertas de vencimiento y detalle a un clic.',
+    text: 'Tus archivos y sistemas convertidos en indicadores claros, alertas de vencimiento y detalle a un clic.',
     tag: 'Python · Streamlit · Plotly',
   },
   {
-    title: 'Automatizaciones',
-    text: 'Flujos que mueven información entre tus herramientas sin copiar y pegar.',
+    title: 'Automatizaciones e integraciones',
+    text: 'Flujos que mueven información entre tu CRM, tus formularios, el correo y tus demás herramientas sin copiar y pegar.',
     tag: 'n8n · APIs · Microsoft 365',
   },
 ]
@@ -178,8 +188,10 @@ export const process = [
 ]
 
 export const stack = [
-  { group: 'Desarrollo web', items: ['React', 'Vite', 'FastAPI', 'SQLAlchemy', 'PostgreSQL'] },
+  { group: 'Desarrollo web', items: ['React', 'Vite', 'FastAPI', 'PHP', 'SQLAlchemy', 'PostgreSQL'] },
   { group: 'Visión artificial', items: ['PyTorch', 'YOLO-World', 'DINOv2', 'RapidOCR'] },
   { group: 'Datos', items: ['Python', 'pandas', 'Plotly', 'Streamlit', 'Excel'] },
+  { group: 'Inteligencia artificial', items: ['Agentes de voz', 'RAG', 'LLM', 'Embeddings'] },
+  { group: 'CRM', items: ['CRM a la medida', 'Implementación', 'Gestión y soporte'] },
   { group: 'Nube y automatización', items: ['Azure', 'Microsoft Graph', 'Caddy', 'n8n'] },
 ]

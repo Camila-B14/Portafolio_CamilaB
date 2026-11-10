@@ -6,7 +6,7 @@
 </p>
 
 <p align="center">
-  <b>Software a la medida para la operación:</b> visión artificial, sistemas web, datos y automatización.<br>
+  <b>Software a la medida para la operación:</b> sistemas web, agentes de IA con voz y RAG, CRMs, visión artificial, datos y automatización.<br>
   Ing. Camila Andrea Beleño Cabrales · Colombia
 </p>
 
@@ -55,12 +55,23 @@ Lee la orden de compra y la factura del proveedor en PDF, detecta contenedores, 
 
 ---
 
+## Servicios
+
+- **Sistemas a medida** para bodega, despacho, importaciones o planta.
+- **Agentes de IA con voz y RAG** que responden con el conocimiento de la empresa.
+- **CRM:** creación a la medida, implementación y gestión.
+- **Visión artificial aplicada** a verificación de productos.
+- **Tableros de datos** e indicadores.
+- **Automatizaciones e integraciones** entre herramientas.
+
 ## Herramientas
 
-**Desarrollo web:** React, Vite, FastAPI, PHP, SQLAlchemy, PostgreSQL
-**Visión artificial:** PyTorch, YOLO-World, DINOv2, RapidOCR
-**Datos:** Python, pandas, Plotly, Streamlit, Excel
-**Nube y automatización:** Azure, Microsoft Graph, OneDrive, n8n
+- **Desarrollo web:** React, Vite, FastAPI, PHP, SQLAlchemy, PostgreSQL
+- **Visión artificial:** PyTorch, YOLO-World, DINOv2, RapidOCR
+- **Datos:** Python, pandas, Plotly, Streamlit, Excel
+- **Inteligencia artificial:** agentes de voz, RAG, LLM, embeddings
+- **CRM:** creación a la medida, implementación, gestión y soporte
+- **Nube y automatización:** Azure, Microsoft Graph, OneDrive, n8n
 
 ## Contacto
 

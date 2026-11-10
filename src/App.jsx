@@ -388,8 +388,8 @@ function Hero() {
             transition={{ duration: 0.7, delay: 0.7, ease }}
           >
             Soy {profile.fullName}. Diseño y desarrollo sistemas a la medida para la operación: despacho
-            verificado con visión artificial, gestión de importaciones, software para planta y automatizaciones
-            que le quitan trabajo manual a los equipos.
+            verificado con visión artificial, gestión de importaciones, CRMs, agentes de IA con voz y RAG, y
+            automatizaciones que le quitan trabajo manual a los equipos.
           </motion.p>
           <motion.div
             className="cta-row"
@@ -425,7 +425,7 @@ function Hero() {
 }
 
 function Marquee() {
-  const words = ['Visión artificial', 'Sistemas web', 'Tableros de datos', 'Automatización', 'Logística', 'Despliegue en la nube']
+  const words = ['Agentes de voz', 'RAG', 'CRM', 'Visión artificial', 'Sistemas web', 'Tableros de datos', 'Automatización', 'Despliegue en la nube']
   const reduce = useReducedMotion()
   const row = [...words, ...words]
   return (
@@ -854,7 +854,7 @@ function Services() {
             <p className="eyebrow">Servicios</p>
             <h2 className="section-title">En qué te puedo ayudar</h2>
           </div>
-          <p className="section-sub">Trabajo con equipos de operación, logística y comercio electrónico que todavía resuelven a mano lo que un sistema podría hacer solo.</p>
+          <p className="section-sub">Trabajo con equipos de operación, logística, ventas y servicio al cliente que todavía resuelven a mano lo que un sistema o un agente de IA podría hacer solo.</p>
         </Reveal>
         <div className="services">
           {services.map((s, i) => (
