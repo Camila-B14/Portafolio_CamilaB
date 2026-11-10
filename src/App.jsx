@@ -387,9 +387,9 @@ function Hero() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.7, ease }}
           >
-            Soy {profile.fullName}. Diseño y desarrollo sistemas para operaciones logísticas: verificación de
-            empaque con visión artificial, tableros de control de importaciones y automatizaciones que le quitan
-            trabajo manual a los equipos.
+            Soy {profile.fullName}. Diseño y desarrollo sistemas a la medida para la operación: despacho
+            verificado con visión artificial, gestión de importaciones, software para planta y automatizaciones
+            que le quitan trabajo manual a los equipos.
           </motion.p>
           <motion.div
             className="cta-row"
@@ -445,14 +445,17 @@ function Marquee() {
 
 /* ------------------------------------------------------------------ proyectos */
 
-function Shot({ shot, big }) {
+function Shot({ shot, big, onOpen }) {
   const { label, src, alt } = typeof shot === 'string' ? { label: shot } : shot
   return (
     <Tilt max={5} glare className={`shot-wrap ${big ? 'shot-big' : ''}`}>
       <figure className="shot">
         <div className="shot-bar" aria-hidden="true"><i /><i /><i /><span>{label}</span></div>
         {src ? (
-          <img className="shot-img" src={src} alt={alt || label} loading="lazy" />
+          <button className="shot-open" onClick={onOpen} aria-label={`Ampliar: ${label}`}>
+            <img className="shot-img" src={src} alt={alt || label} loading="lazy" />
+            <span className="shot-zoom" aria-hidden="true">Ampliar ⤢</span>
+          </button>
         ) : (
           <div className="shot-body">
             <span className="mono">Captura pendiente</span>
@@ -461,6 +464,91 @@ function Shot({ shot, big }) {
         )}
       </figure>
     </Tilt>
+  )
+}
+
+function Lightbox({ images, index, onClose, onMove }) {
+  const img = images[index]
+  useEffect(() => {
+    const onKey = (e) => {
+      if (e.key === 'Escape') onClose()
+      if (e.key === 'ArrowRight') onMove(1)
+      if (e.key === 'ArrowLeft') onMove(-1)
+    }
+    window.addEventListener('keydown', onKey)
+    document.body.style.overflow = 'hidden'
+    return () => { window.removeEventListener('keydown', onKey); document.body.style.overflow = '' }
+  }, [onClose, onMove])
+  return (
+    <motion.div className="modal" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={onClose}>
+      <motion.figure
+        className="lightbox"
+        role="dialog"
+        aria-modal="true"
+        aria-label={img.label}
+        initial={{ scale: 0.92, y: 30 }}
+        animate={{ scale: 1, y: 0 }}
+        exit={{ scale: 0.95, opacity: 0 }}
+        transition={{ type: 'spring', stiffness: 260, damping: 26 }}
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="modal-head">
+          <span className="mono">{index + 1} / {images.length} · {img.label}</span>
+          <button id="close-lightbox" className="link-btn modal-close" onClick={onClose} autoFocus>Cerrar ✕</button>
+        </div>
+        <div className="lightbox-stage">
+          <AnimatePresence mode="wait" initial={false}>
+            <motion.img
+              key={img.src}
+              src={img.src}
+              alt={img.alt || img.label}
+              initial={{ opacity: 0, x: 30 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -30 }}
+              transition={{ duration: 0.25, ease }}
+            />
+          </AnimatePresence>
+        </div>
+        {images.length > 1 && (
+          <div className="lightbox-nav">
+            <button id="lightbox-prev" className="btn btn-ghost-dark" onClick={() => onMove(-1)}>← Anterior</button>
+            <button id="lightbox-next" className="btn btn-ghost-dark" onClick={() => onMove(1)}>Siguiente →</button>
+          </div>
+        )}
+      </motion.figure>
+    </motion.div>
+  )
+}
+
+/* Recorrido del sistema: pasos con un pulso que viaja de principio a fin. */
+function Pipeline({ steps }) {
+  const reduce = useReducedMotion()
+  return (
+    <div className="pipeline" aria-label="Cómo funciona" style={{ "--n": steps.length }}>
+      <div className="pipeline-line" aria-hidden="true">
+        {!reduce && (
+          <motion.span
+            className="pipeline-pulse"
+            animate={{ left: ['0%', '100%'], opacity: [0, 1, 1, 0] }}
+            transition={{ duration: 4.5, repeat: Infinity, ease: 'easeInOut', times: [0, 0.1, 0.9, 1] }}
+          />
+        )}
+      </div>
+      <ol>
+        {steps.map((s, i) => (
+          <motion.li
+            key={s}
+            initial={{ opacity: 0.3, y: 10 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: '-40px' }}
+            transition={{ delay: i * 0.12, duration: 0.5, ease }}
+          >
+            <span className="pipeline-dot" aria-hidden="true">{i + 1}</span>
+            <span className="pipeline-label">{s}</span>
+          </motion.li>
+        ))}
+      </ol>
+    </div>
   )
 }
 
@@ -518,7 +606,7 @@ function Metric({ m }) {
   )
 }
 
-function CaseStudy({ p }) {
+function CaseStudy({ p, onOpenImage, offset }) {
   return (
     <motion.div
       className="case"
@@ -550,13 +638,50 @@ function CaseStudy({ p }) {
           </ol>
         </div>
       </div>
+      {p.gallery?.length > 0 && (
+        <div className="case-gallery">
+          <h4 className="mono">Más capturas</h4>
+          <div className="case-gallery-grid">
+            {p.gallery.map((g, i) => (
+              <button key={g.src} className="thumb" onClick={() => onOpenImage(offset + i)} aria-label={`Ampliar: ${g.label}`}>
+                <img src={g.src} alt={g.alt || g.label} loading="lazy" />
+                <span>{g.label}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
     </motion.div>
+  )
+}
+
+function ComingSoon() {
+  const items = ['El problema', 'La solución', 'Capturas', 'Resultados']
+  return (
+    <ul className="coming" aria-label="Lo que tendrá este caso">
+      {items.map((it, i) => (
+        <motion.li
+          key={it}
+          initial={{ opacity: 0.3, x: 12 }}
+          whileInView={{ opacity: 1, x: 0 }}
+          viewport={{ once: true }}
+          transition={{ delay: i * 0.1, ease }}
+        >
+          <span className="coming-dot" aria-hidden="true" /> {it}
+        </motion.li>
+      ))}
+    </ul>
   )
 }
 
 function ProjectCard({ p }) {
   const [open, setOpen] = useState(false)
   const [playing, setPlaying] = useState(false)
+  const [lightbox, setLightbox] = useState(null)
+  const images = [...(p.shots || []).filter((s) => s.src), ...(p.gallery || [])]
+  const shotsWithSrc = (p.shots || []).filter((s) => s.src).length
+  const openShot = (shot) => setLightbox(images.findIndex((im) => im.src === shot.src))
+  const move = (dir) => setLightbox((i) => (i + dir + images.length) % images.length)
 
   if (p.pending) {
     return (
@@ -571,7 +696,7 @@ function ProjectCard({ p }) {
             <p className="project-tagline">{p.tagline}</p>
             <p className="muted">{p.summary}</p>
           </div>
-          <FlowSketch />
+          {p.sketch === 'flow' ? <FlowSketch /> : <ComingSoon />}
         </div>
       </motion.article>
     )
@@ -595,6 +720,7 @@ function ProjectCard({ p }) {
           <h3 className="project-name">{p.name}</h3>
           <p className="project-tagline">{p.tagline}</p>
           <p className="muted">{p.summary}</p>
+          {p.flow && <Pipeline steps={p.flow} />}
           <div className={`metrics metrics-${p.metrics.length}`}>
             {p.metrics.map((m, i) => <Metric key={i} m={m} />)}
           </div>
@@ -626,15 +752,20 @@ function ProjectCard({ p }) {
           {p.note && <p className="note mono">{p.note}</p>}
         </div>
         <div className="shots">
-          <Shot shot={p.shots[0]} big />
-          <Shot shot={p.shots[1]} />
-          <Shot shot={p.shots[2]} />
+          {p.shots.map((sh, i) => (
+            <Shot key={sh.label} shot={sh} big={i === 0} onOpen={() => openShot(sh)} />
+          ))}
         </div>
       </div>
       <div id={`case-panel-${p.id}`}>
-        <AnimatePresence initial={false}>{open && <CaseStudy p={p} />}</AnimatePresence>
+        <AnimatePresence initial={false}>{open && <CaseStudy p={p} onOpenImage={setLightbox} offset={shotsWithSrc} />}</AnimatePresence>
       </div>
       <AnimatePresence>{playing && <VideoModal project={p} onClose={() => setPlaying(false)} />}</AnimatePresence>
+      <AnimatePresence>
+        {lightbox != null && images[lightbox] && (
+          <Lightbox images={images} index={lightbox} onClose={() => setLightbox(null)} onMove={move} />
+        )}
+      </AnimatePresence>
     </motion.article>
   )
 }
